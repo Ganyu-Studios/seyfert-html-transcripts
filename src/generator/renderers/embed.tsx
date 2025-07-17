@@ -5,11 +5,11 @@ import {
   DiscordEmbedFields,
   DiscordEmbedFooter,
 } from '@derockdev/discord-components-react';
-import type { Embed, Message } from 'discord.js';
 import React from 'react';
 import type { RenderMessageContext } from '..';
 import { calculateInlineIndex } from '../../utils/embeds';
 import MessageContent, { RenderType } from './content';
+import type { Embed, Message } from 'seyfert';
 
 type RenderEmbedContext = RenderMessageContext & {
   index: number;
@@ -19,33 +19,33 @@ type RenderEmbedContext = RenderMessageContext & {
 export async function DiscordEmbed({ embed, context }: { embed: Embed; context: RenderEmbedContext }) {
   return (
     <DiscordEmbedComponent
-      embedTitle={embed.title ?? undefined}
+      embedTitle={embed.data.title ?? undefined}
       slot="embeds"
       key={`${context.message.id}-e-${context.index}`}
-      authorImage={embed.author?.proxyIconURL ?? embed.author?.iconURL}
-      authorName={embed.author?.name}
-      authorUrl={embed.author?.url}
-      color={embed.hexColor ?? undefined}
-      image={embed.image?.proxyURL ?? embed.image?.url}
-      thumbnail={embed.thumbnail?.proxyURL ?? embed.thumbnail?.url}
-      url={embed.url ?? undefined}
+      authorImage={embed.data.author?.proxy_icon_url ?? embed.data.author?.icon_url}
+      authorName={embed.data.author?.name}
+      authorUrl={embed.data.author?.url}
+      color={embed.data.color?.toString() ?? undefined}
+      image={embed.data.image?.proxy_url ?? embed.data.image?.url}
+      thumbnail={embed.data.thumbnail?.proxy_url ?? embed.data.thumbnail?.url}
+      url={embed.data.url ?? undefined}
     >
       {/* Description */}
-      {embed.description && (
+      {embed.data.description && (
         <DiscordEmbedDescription slot="description">
-          <MessageContent content={embed.description} context={{ ...context, type: RenderType.EMBED }} />
+          <MessageContent content={embed.data.description} context={{ ...context, type: RenderType.EMBED }} />
         </DiscordEmbedDescription>
       )}
 
       {/* Fields */}
-      {embed.fields.length > 0 && (
+      {embed.data.fields && embed.data.fields.length > 0 && (
         <DiscordEmbedFields slot="fields">
-          {embed.fields.map(async (field, id) => (
+          {embed.data.fields.map(async (field, id) => (
             <DiscordEmbedField
               key={`${context.message.id}-e-${context.index}-f-${id}`}
               fieldTitle={field.name}
               inline={field.inline}
-              inlineIndex={calculateInlineIndex(embed.fields, id)}
+              inlineIndex={calculateInlineIndex(embed.data.fields ?? [], id)}
             >
               <MessageContent content={field.value} context={{ ...context, type: RenderType.EMBED }} />
             </DiscordEmbedField>
@@ -54,13 +54,13 @@ export async function DiscordEmbed({ embed, context }: { embed: Embed; context: 
       )}
 
       {/* Footer */}
-      {embed.footer && (
+      {embed.data.footer && (
         <DiscordEmbedFooter
           slot="footer"
-          footerImage={embed.footer.proxyIconURL ?? embed.footer.iconURL}
-          timestamp={embed.timestamp ?? undefined}
+          footerImage={embed.data.footer.proxy_icon_url ?? embed.data.footer.icon_url}
+          timestamp={embed.data.timestamp ?? undefined}
         >
-          {embed.footer.text}
+          {embed.data.footer.text}
         </DiscordEmbedFooter>
       )}
     </DiscordEmbedComponent>

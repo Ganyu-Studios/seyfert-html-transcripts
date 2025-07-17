@@ -95,7 +95,7 @@ const attachment = await discordTranscripts.createTranscript(channel, {
       resolveUser: (userId: string) => Awaitable<User | null>,
       resolveRole: (roleId: string) => Awaitable<Role | null>
     },
-    poweredBy: true // Whether to include the "Powered by discord-html-transcripts" footer
+    poweredBy: true // Whether to include the "Powered by seyfert-html-transcripts" footer
 });
 ```
 
@@ -137,7 +137,7 @@ The default value is `Exported {number} message{s}`
 
 #### `options.poweredBy: boolean`
 
-Disabling this will remove the `Powered by discord-html-transcripts` in the footer.
+Disabling this will remove the `Powered by seyfert-html-transcripts` in the footer.
 
 The default value is `true`
 

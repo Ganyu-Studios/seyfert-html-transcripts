@@ -1,7 +1,8 @@
-import type { APIAttachment, APIMessage, Awaitable } from 'discord.js';
 import type { WebpOptions } from 'sharp';
 import { request } from 'undici';
 import debug from 'debug';
+import type { APIAttachment, APIMessage } from 'seyfert/lib/types';
+import type { Awaitable } from 'seyfert/lib/common';
 
 /**
  * Callback used to save an image attachment.

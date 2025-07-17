@@ -1,4 +1,5 @@
-import type { APIMessageComponentEmoji, Emoji } from 'discord.js';
+import type { Emoji } from 'seyfert';
+import type { APIMessageComponentEmoji } from 'seyfert/lib/types';
 import twemoji from 'twemoji';
 
 export function isDefined<T>(value: T | undefined | null): value is T {
@@ -44,3 +45,11 @@ export function streamToString(stream: NodeJS.ReadableStream) {
     stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
   });
 }
+
+/**
+ *
+ * Convert a number color to HEX
+ * @param color - The color number
+ * @returns
+ */
+export const convertToHEX = (color?: number) => (color ? `#${color.toString(16).padStart(6, '0')}` : '#FFFFFF');

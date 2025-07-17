@@ -1,4 +1,4 @@
-import type { AttachmentBuilder, Message } from 'discord.js';
+import type { AttachmentBuilder, Message } from 'seyfert';
 import type { RenderMessageContext } from './generator';
 
 export type AttachmentTypes = 'audio' | 'video' | 'image' | 'file';
@@ -40,7 +40,7 @@ export type GenerateFromMessagesOptions<T extends ExportReturnType> = Partial<{
   filename: string;
 
   /**
-   * Whether to include the "Powered by discord-html-transcripts" footer
+   * Whether to include the "Powered by seyfert-html-transcripts" footer
    * @default true
    */
   poweredBy: boolean;
@@ -77,6 +77,6 @@ export type CreateTranscriptOptions<T extends ExportReturnType> = Partial<
      * Filter messages of the channel
      * @default (() => true)
      */
-    filter: (message: Message<boolean>) => boolean;
+    filter: (message: Message) => boolean;
   }
 >;

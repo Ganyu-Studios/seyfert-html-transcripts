@@ -1,9 +1,11 @@
 import { DiscordAttachment, DiscordAttachments } from '@derockdev/discord-components-react';
 import React from 'react';
-import type { APIAttachment, APIMessage, Attachment as AttachmentType, Message } from 'discord.js';
+import type { Attachment as AttachmentType, Message } from 'seyfert';
 import type { RenderMessageContext } from '..';
 import type { AttachmentTypes } from '../../types';
 import { formatBytes } from '../../utils/utils';
+import type { APIMessage } from 'seyfert/lib/types';
+import { ReplaceRegex, toSnakeCase } from 'seyfert/lib/common';
 
 /**
  * Renders all attachments for a message
@@ -12,12 +14,12 @@ import { formatBytes } from '../../utils/utils';
  * @returns
  */
 export async function Attachments(props: { message: Message; context: RenderMessageContext }) {
-  if (props.message.attachments.size === 0) return <></>;
+  if (props.message.attachments.length === 0) return <></>;
 
   return (
     <DiscordAttachments slot="attachments">
       {props.message.attachments.map((attachment, id) => (
-        <Attachment attachment={attachment} message={props.message} context={props.context} key={id} />
+        <Attachment attachment={attachment as never} message={props.message} context={props.context} key={id} />
       ))}
     </DiscordAttachments>
   );
@@ -44,17 +46,35 @@ export async function Attachment({
   message: Message;
 }) {
   let url = attachment.url;
-  const name = attachment.name;
+  const name = attachment.filename;
   const width = attachment.width;
   const height = attachment.height;
 
   const type = getAttachmentType(attachment);
 
+  function toJSON(message: Message) {
+    const keys = Object.getOwnPropertyNames(message);
+    const obj: Partial<APIMessage> = {};
+
+    for (const key of keys) {
+      if (['timestamp', 'client'].includes(key)) continue;
+
+      const value = message[key as keyof Message];
+      if (value && typeof value === "object" && "client" in value) Object.defineProperty(value, "client", { value: undefined });
+
+      if (value === undefined || value === null) continue;
+
+      obj[ReplaceRegex.snake(key) as keyof APIMessage] = toSnakeCase(message[key as keyof Message] as never);
+    }
+
+    return obj;
+  }
+
   // if the attachment is an image, download it to a data url
   if (type === 'image') {
     const downloaded = await context.callbacks.resolveImageSrc(
-      attachment.toJSON() as APIAttachment,
-      message.toJSON() as APIMessage
+      "data" in attachment ? attachment.data : attachment,
+      toJSON(message) as APIMessage,
     );
 
     if (downloaded !== null) {

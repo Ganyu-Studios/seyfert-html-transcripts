@@ -1,9 +1,13 @@
 import { DiscordReaction, DiscordReactions, DiscordSystemMessage } from '@derockdev/discord-components-react';
-import { MessageType, type GuildMember, type Message, type User } from 'discord.js';
 import React from 'react';
-import { parseDiscordEmoji } from '../../utils/utils';
+import { convertToHEX, parseDiscordEmoji } from '../../utils/utils';
+import type { GuildMember, Message, User } from 'seyfert';
+import type { APIMessageComponentEmoji } from 'seyfert/lib/types';
+import { MessageType } from 'seyfert/lib/types';
 
 export default async function SystemMessage({ message }: { message: Message }) {
+  const role = await message.member?.roles.highest()
+
   switch (message.type) {
     case MessageType.RecipientAdd:
     case MessageType.UserJoin:
@@ -16,18 +20,18 @@ export default async function SystemMessage({ message }: { message: Message }) {
     case MessageType.ChannelPinnedMessage:
       return (
         <DiscordSystemMessage id={`m-${message.id}`} key={message.id} type="pin">
-          <Highlight color={message.member?.roles.color?.hexColor}>
-            {message.author.displayName ?? message.author.username}
+          <Highlight color={convertToHEX(role?.color)}>
+            {message.author.tag}
           </Highlight>{' '}
-          pinned <i data-goto={message.reference?.messageId}>a message</i> to this channel.
+          pinned <i data-goto={message.messageReference?.messageId}>a message</i> to this channel.
           {/* reactions */}
-          {message.reactions.cache.size > 0 && (
+          {message.reactions && message.reactions.length > 0 && (
             <DiscordReactions slot="reactions">
-              {message.reactions.cache.map((reaction, id) => (
+              {message.reactions.map((reaction, id) => (
                 <DiscordReaction
                   key={`${message.id}r${id}`}
                   name={reaction.emoji.name!}
-                  emoji={parseDiscordEmoji(reaction.emoji)}
+                  emoji={parseDiscordEmoji(reaction.emoji as APIMessageComponentEmoji)}
                   count={reaction.count}
                 />
               ))}
@@ -42,8 +46,8 @@ export default async function SystemMessage({ message }: { message: Message }) {
     case MessageType.GuildBoostTier3:
       return (
         <DiscordSystemMessage id={`m-${message.id}`} key={message.id} type="boost">
-          <Highlight color={message.member?.roles.color?.hexColor}>
-            {message.author.displayName ?? message.author.username}
+          <Highlight color={convertToHEX(role?.color)}>
+            {message.author.tag}
           </Highlight>{' '}
           boosted the server!
         </DiscordSystemMessage>
@@ -52,10 +56,10 @@ export default async function SystemMessage({ message }: { message: Message }) {
     case MessageType.ThreadStarterMessage:
       return (
         <DiscordSystemMessage id={`ms-${message.id}`} key={message.id} type="thread">
-          <Highlight color={message.member?.roles.color?.hexColor}>
-            {message.author.displayName ?? message.author.username}
+          <Highlight color={convertToHEX(role?.color)}>
+            {message.author.tag}
           </Highlight>{' '}
-          started a thread: <i data-goto={message.reference?.messageId}>{message.content}</i>
+          started a thread: <i data-goto={message.messageReference?.messageId}>{message.content}</i>
         </DiscordSystemMessage>
       );
 
@@ -108,15 +112,16 @@ const allJoinMessages = [
   "Hello. Is it {user} you're looking for?",
 ];
 
-export function JoinMessage({ member, fallbackUser }: { member: GuildMember | null; fallbackUser: User }) {
+export async function JoinMessage({ member, fallbackUser }: { member: GuildMember | null | undefined; fallbackUser: User }) {
   const randomMessage = allJoinMessages[Math.floor(Math.random() * allJoinMessages.length)];
+  const role = await member?.roles.highest()
 
   return randomMessage
     .split('{user}')
     .flatMap((item, i) => [
       item,
-      <Highlight color={member?.roles.color?.hexColor} key={i}>
-        {member?.nickname ?? fallbackUser.displayName ?? fallbackUser.username}
+      <Highlight color={convertToHEX(role?.color)} key={i}>
+        {member?.nick ?? fallbackUser.tag}
       </Highlight>,
     ])
     .slice(0, -1);

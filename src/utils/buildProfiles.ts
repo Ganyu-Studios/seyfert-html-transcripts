@@ -1,4 +1,6 @@
-import { type GuildMember, type Message, type User, UserFlags } from 'discord.js';
+import type { GuildMember, Message, User } from "seyfert";
+import { convertToHEX } from "./utils";
+import { UserFlags } from "seyfert/lib/types";
 
 export type Profile = {
   author: string; // author of the message
@@ -20,22 +22,25 @@ export async function buildProfiles(messages: Message[]) {
     const author = message.author;
     if (!profiles[author.id]) {
       // add profile
-      profiles[author.id] = buildProfile(message.member, author);
+      profiles[author.id] = await buildProfile(message.member, message.guildId, author);
     }
 
     // add interaction users
-    if (message.interaction) {
-      const user = message.interaction.user;
+    if (message.interactionMetadata) {
+      const user = await message.client.users.fetch(message.interactionMetadata.user.id);
       if (!profiles[user.id]) {
-        profiles[user.id] = buildProfile(null, user);
+        profiles[user.id] = await buildProfile(null, message.guildId, user);
       }
     }
 
     // threads
-    if (message.thread && message.thread.lastMessage) {
-      profiles[message.thread.lastMessage.author.id] = buildProfile(
-        message.thread.lastMessage.member,
-        message.thread.lastMessage.author
+    if (message.thread && message.thread.lastMessageId) {
+      const thread = await message.client.messages.fetch(message.thread.lastMessageId, message.channelId);
+
+      profiles[thread.author.id] = await buildProfile(
+        thread.member,
+        thread.guildId,
+        thread.author
       );
     }
   }
@@ -44,14 +49,20 @@ export async function buildProfiles(messages: Message[]) {
   return profiles;
 }
 
-function buildProfile(member: GuildMember | null, author: User) {
+async function buildProfile(member: GuildMember | null | undefined, guildId: string | null | undefined, author: User) {
+  await author.fetch();
+
+  if (guildId && !member) member = await author.client.members.fetch(guildId, author.id)
+
+  const role = await member?.roles.highest();
+
   return {
-    author: member?.nickname ?? author.displayName ?? author.username,
-    avatar: member?.displayAvatarURL({ size: 64 }) ?? author.displayAvatarURL({ size: 64 }),
-    roleColor: member?.displayHexColor,
-    roleIcon: member?.roles.icon?.iconURL() ?? undefined,
-    roleName: member?.roles.hoist?.name ?? undefined,
+    author: author.tag,
+    avatar: member?.avatarURL({ size: 64 }) ?? author.avatarURL({ size: 64 }),
+    roleColor: convertToHEX(role?.color ?? author.accentColor ?? undefined),
+    roleIcon: role?.icon ?? undefined,
+    roleName: role?.name ?? undefined,
     bot: author.bot,
-    verified: author.flags?.has(UserFlags.VerifiedBot),
+    verified: (author.publicFlags ?? 0 & UserFlags.VerifiedBot) === UserFlags.VerifiedBot,
   };
 }

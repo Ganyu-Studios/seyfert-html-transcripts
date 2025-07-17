@@ -1,9 +1,10 @@
 import { DiscordHeader, DiscordMessages as DiscordMessagesComponent } from '@derockdev/discord-components-react';
-import { ChannelType } from 'discord.js';
 import React from 'react';
 import type { RenderMessageContext } from '.';
 import MessageContent, { RenderType } from './renderers/content';
 import DiscordMessage from './renderers/message';
+import { ChannelType } from 'seyfert/lib/types';
+import type { AllGuildTextableChannels } from 'seyfert';
 
 /**
  * The core transcript component.
@@ -17,21 +18,23 @@ export default async function DiscordMessages({ messages, channel, callbacks, ..
     <DiscordMessagesComponent style={{ minHeight: '100vh' }}>
       {/* header */}
       <DiscordHeader
-        guild={channel.isDMBased() ? 'Direct Messages' : channel.guild.name}
+        guild={channel.isDM() || channel.isDirectory() ? 'Direct Messages' : (channel as AllGuildTextableChannels).guild.name}
         channel={
-          channel.isDMBased()
+          channel.isDM()
             ? channel.type === ChannelType.DM
-              ? channel.recipient?.tag ?? 'Unknown Recipient'
+              ? channel.recipients?.find((r) => r.id !== channel.id)?.username ?? 'Unknown Recipient'
               : 'Unknown Recipient'
-            : channel.name
+            : channel.isDirectory()
+              ? "Unknown Directory"
+              : (channel as AllGuildTextableChannels).name
         }
-        icon={channel.isDMBased() ? undefined : channel.guild.iconURL({ size: 128 }) ?? undefined}
+        icon={channel.isDM() || channel.isDirectory() ? undefined : (await (channel as AllGuildTextableChannels).guild()).iconURL({ size: 128 }) ?? undefined}
       >
         {channel.isThread() ? (
-          `Thread channel in ${channel.parent?.name ?? 'Unknown Channel'}`
-        ) : channel.isDMBased() ? (
+          `Thread channel in ${channel.parentId ?? 'Unknown Channel'}`
+        ) : channel.isDM() ? (
           `Direct Messages`
-        ) : channel.isVoiceBased() ? (
+        ) : channel.isVoice() ? (
           `Voice Text Channel for ${channel.name}`
         ) : channel.type === ChannelType.GuildCategory ? (
           `Category Channel`
@@ -41,7 +44,7 @@ export default async function DiscordMessages({ messages, channel, callbacks, ..
             context={{ messages, channel, callbacks, type: RenderType.REPLY, ...options }}
           />
         ) : (
-          `This is the start of #${channel.name} channel.`
+          channel.isDirectory() ? `This is the start of the directory.` : `This is the start of #${(channel as AllGuildTextableChannels).name} channel.`
         )}
       </DiscordHeader>
 
@@ -54,14 +57,14 @@ export default async function DiscordMessages({ messages, channel, callbacks, ..
       <div style={{ textAlign: 'center', width: '100%' }}>
         {options.footerText
           ? options.footerText
-              .replaceAll('{number}', messages.length.toString())
-              .replaceAll('{s}', messages.length > 1 ? 's' : '')
+            .replaceAll('{number}', messages.length.toString())
+            .replaceAll('{s}', messages.length > 1 ? 's' : '')
           : `Exported ${messages.length} message${messages.length > 1 ? 's' : ''}.`}{' '}
         {options.poweredBy ? (
           <span style={{ textAlign: 'center' }}>
             Powered by{' '}
-            <a href="https://github.com/ItzDerock/discord-html-transcripts" style={{ color: 'lightblue' }}>
-              discord-html-transcripts
+            <a href="https://github.com/Ganyu-Studios/seyfert-html-transcripts" style={{ color: 'lightblue' }}>
+              seyfert-html-transcripts
             </a>
             .
           </span>

@@ -1,39 +1,62 @@
-import * as discord from 'discord.js';
+import "dotenv/config";
+
+import { Client, type ParseClient } from "seyfert";
+import { GatewayIntentBits } from "seyfert/lib/types";
+
 import { createTranscript } from '../src';
 
-import { config } from 'dotenv';
-config();
-
-const { GuildMessages, Guilds, MessageContent } = discord.GatewayIntentBits;
-
-const client = new discord.Client({
-  intents: [GuildMessages, Guilds, MessageContent],
+const client = new Client({
+  getRC() {
+    return {
+      locations: {
+        base: "."
+      },
+      token: process.env.TOKEN!,
+      intents: [
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.MessageContent
+      ].reduce((a, b) => a | b, 0),
+    }
+  },
 });
 
-client.on('ready', async () => {
-  console.log('Fetching channel: ', process.env.CHANNEL!);
-  const channel = await client.channels.fetch(process.env.CHANNEL!);
+client.events.values.READY = {
+  __filePath: null,
+  data: { name: "ready", once: true },
+  async run(user, client) {
+    client.logger.info(`Logged in as ${user.username}`);
 
-  if (!channel || !channel.isTextBased()) {
-    console.error('Invalid channel provided.');
-    process.exit(1);
+    if (process.env.CHANNEL) {
+      const channel = await client.channels.fetch(process.env.CHANNEL).catch(() => null);
+      if (!channel || !channel.isGuildTextable()) {
+        client.logger.error("Invalid channel provided.");
+        process.exit(1);
+      }
+
+      console.info(`Generating transcript for channel ${channel.name}...`);
+
+      const attachment = await createTranscript(channel, {
+        // the options for the 
+        limit: 10,
+      });
+
+      console.info(`Transcript generated for channel ${channel.name}.`);
+
+      await channel.messages.write({
+        content: "Here is the transcript",
+        files: [attachment],
+      });
+
+      client.gateway.disconnectAll();
+      process.exit(0);
+    }
   }
+}
 
-  console.time('transcript');
+client.start();
 
-  const attachment = await createTranscript(channel, {
-    // options go here
-  });
-
-  console.timeEnd('transcript');
-
-  await (channel as discord.TextChannel).send({
-    content: 'Here is the transcript',
-    files: [attachment],
-  });
-
-  client.destroy();
-  process.exit(0);
-});
-
-client.login(process.env.TOKEN!);
+declare module "seyfert" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface 
+  interface UsingClient extends ParseClient<Client<true>> { }
+}

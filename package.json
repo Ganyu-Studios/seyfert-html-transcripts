@@ -1,7 +1,7 @@
 {
   "name": "discord-html-transcripts",
   "version": "3.2.0",
-  "description": "A nicely formatted html transcript generator for discord.js.",
+  "description": "A nicely formatted html transcript generator for seyfert.",
   "main": "dist/index.js",
   "homepage": "https://github.com/ItzDerock/discord-html-transcripts",
   "types": "./dist/index.d.ts",
@@ -18,9 +18,9 @@
     "url": "git+https://github.com/ItzDerock/discord-html-transcripts.git"
   },
   "keywords": [
-    "discord.js",
-    "discord.js-transcripts",
-    "discord.js-html-transcripts",
+    "seyfert",
+    "seyfert-transcripts",
+    "seyfert-html-transcripts",
     "html-transcripts",
     "discord-html-transcripts",
     "discord-transcripts"
@@ -40,7 +40,6 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "debug": "^4.3.4",
-    "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
     "eslint": "^8.56.0",
     "husky": "^8.0.3",
@@ -56,15 +55,16 @@
     "discord-markdown-parser": "~1.1.0",
     "react": "0.0.0-experimental-6639ed3b3-20240111",
     "react-dom": "0.0.0-experimental-6639ed3b3-20240111",
+    "seyfert": "github:tiramisulabs/seyfert",
     "simple-markdown": "^0.7.3",
     "twemoji": "^14.0.2",
     "undici": "^7.9.0"
   },
   "peerDependencies": {
-    "discord.js": "^14.0.0 || ^15.0.0"
+    "seyfert": "^3.2.4"
   },
   "overrides": {
     "react": "$react"
   },
-  "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977"
+  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad"
 }
