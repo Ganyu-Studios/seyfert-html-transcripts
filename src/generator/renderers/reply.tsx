@@ -17,7 +17,7 @@ export default async function MessageReply({ message, context }: { message: Mess
   const isCommand = referencedMessage.interactionMetadata !== null;
 
   const channel = await message.channel();
-  const role = await referencedMessage.member?.roles.highest()
+  const role = await referencedMessage.member?.roles.highest();
 
   return (
     <DiscordReply
