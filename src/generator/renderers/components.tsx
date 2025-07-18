@@ -20,19 +20,19 @@ const ButtonStyleMapping = {
   [ButtonStyle.Success]: 'success',
   [ButtonStyle.Danger]: 'destructive',
   [ButtonStyle.Link]: 'secondary',
-  [ButtonStyle.Premium]: 'primary'
+  [ButtonStyle.Premium]: 'primary',
 } as const;
 
 export function Component({ component, id }: { component: ActionRowMessageComponents; id: number }) {
-  if (component.type === ComponentType.Button) {
+  if (component.data.type === ComponentType.Button) {
     return (
       <DiscordButton
         key={id}
-        type={"style" in component ? ButtonStyleMapping[component.style] : 'secondary'}
-        url={"url" in component ? component.url : undefined}
-        emoji={"emoji" in component ? parseDiscordEmoji(component.emoji!) : undefined}
+        type={'style' in component.data ? ButtonStyleMapping[component.data.style] : 'secondary'}
+        url={'url' in component.data ? component.data.url : undefined}
+        emoji={'emoji' in component.data ? parseDiscordEmoji(component.data.emoji!) : undefined}
       >
-        {"label" in component ? component.label : undefined}
+        {'label' in component.data ? component.data.label : undefined}
       </DiscordButton>
     );
   }

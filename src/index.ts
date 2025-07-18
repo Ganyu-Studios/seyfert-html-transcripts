@@ -6,7 +6,8 @@ import {
   type ObjectType,
 } from './types';
 import { TranscriptImageDownloader, type ResolveImageCallback } from './downloader/images';
-import { AllGuildChannels, AttachmentBuilder, Collection, Message, TextBaseGuildChannel } from 'seyfert';
+import type { AllGuildChannels, Message, TextBaseGuildChannel } from 'seyfert';
+import { AttachmentBuilder, Collection } from 'seyfert';
 
 // re-exports
 export { default as DiscordMessages } from './generator/transcript';
@@ -48,7 +49,10 @@ export async function generateFromMessages<T extends ExportReturnType = ExportRe
       resolveImageSrc,
       resolveChannel: async (id) => channel.client.channels.fetch(id).catch(() => null),
       resolveUser: async (id) => channel.client.users.fetch(id).catch(() => null),
-      resolveRole: channel.isDM() || channel.isDirectory() ? () => null : async (id) => channel.client.roles.fetch(channel.guildId, id).catch(() => null),
+      resolveRole:
+        channel.isDM() || channel.isDirectory()
+          ? () => null
+          : async (id) => channel.client.roles.fetch(channel.guildId, id).catch(() => null),
 
       ...(options.callbacks ?? {}),
     },
@@ -76,8 +80,8 @@ export async function generateFromMessages<T extends ExportReturnType = ExportRe
   }
 
   return new AttachmentBuilder()
-  .setFile("buffer", Buffer.from(html))
-  .setName(options.filename ?? `transcript-${channel.id}.html`) as unknown as ObjectType<T>;
+    .setFile('buffer', Buffer.from(html))
+    .setName(options.filename ?? `transcript-${channel.id}.html`) as unknown as ObjectType<T>;
 }
 
 /**
@@ -91,9 +95,7 @@ export async function createTranscript<T extends ExportReturnType = ExportReturn
   options: CreateTranscriptOptions<T> = {}
 ): Promise<ObjectType<T>> {
   // validate type
-  if (!channel.isGuildTextable())
-    throw new TypeError(`Provided channel must be text-based, received ${channel.type}`);
-  
+  if (!channel.isGuildTextable()) throw new TypeError(`Provided channel must be text-based, received ${channel.type}`);
 
   // fetch messages
   let allMessages: Message[] = [];
@@ -102,7 +104,7 @@ export async function createTranscript<T extends ExportReturnType = ExportReturn
   const resolvedLimit = typeof limit === 'undefined' || limit === -1 ? Infinity : limit;
 
   // until there are no more messages, keep fetching
-  // eslint-disable-next-line no-constant-condition
+
   while (true) {
     // create fetch options
     const fetchLimitOptions = { limit: 100, before: lastMessageId };
@@ -113,7 +115,12 @@ export async function createTranscript<T extends ExportReturnType = ExportReturn
     const filteredMessages = typeof filter === 'function' ? messages.filter(filter) : messages;
 
     // add the messages to the array
-    allMessages.push(...filteredMessages.values());
+    allMessages.push(
+      ...filteredMessages.map((message) => {
+        if (typeof message.guildId === 'undefined') message.guildId = channel.guildId;
+        return message;
+      })
+    );
     // Get the last key of 'messages', not 'filteredMessages' because you will be refetching the same messages
     lastMessageId = messages.at(-1)?.id;
 

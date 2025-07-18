@@ -18,7 +18,7 @@ import type { SingleASTNode } from 'simple-markdown';
 import type { RenderMessageContext } from '../';
 import { convertToHEX, parseDiscordEmoji } from '../../utils/utils';
 import type { AllGuildTextableChannels } from 'seyfert';
-import type { APIMessageComponentEmoji} from 'seyfert/lib/types';
+import type { APIMessageComponentEmoji } from 'seyfert/lib/types';
 import { ChannelType } from 'seyfert/lib/types';
 
 export enum RenderType {

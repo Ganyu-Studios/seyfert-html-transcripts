@@ -1,5 +1,5 @@
-import ReactDOMServer from 'react-dom/server';
 import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 import { buildProfiles } from '../utils/buildProfiles';
 import { revealSpoiler, scrollToMessage } from '../static/client';
 import { readFileSync } from 'fs';
@@ -58,13 +58,16 @@ export default async function render({ messages, channel, callbacks, ...options 
             options.favicon === 'guild'
               ? channel.isDM() || channel.isDirectory()
                 ? undefined
-                : (await (channel as AllGuildTextableChannels).guild()).iconURL({ size: 16, extension: 'png' }) ?? undefined
+                : ((await (channel as AllGuildTextableChannels).guild()).iconURL({ size: 16, extension: 'png' }) ??
+                  undefined)
               : options.favicon
           }
         />
 
         {/* title */}
-        <title>{channel.isDM() || channel.isDirectory() ? 'Direct Messages' : (channel as AllGuildTextableChannels).name}</title>
+        <title>
+          {channel.isDM() || channel.isDirectory() ? 'Direct Messages' : (channel as AllGuildTextableChannels).name}
+        </title>
 
         {/* message reference handler */}
         <script
@@ -110,7 +113,7 @@ export default async function render({ messages, channel, callbacks, ...options 
     const result = await renderToString(markup, {
       beforeHydrate: async (document) => {
         document.defaultView.$discordMessage = {
-          profiles: await profiles,
+          profiles,
         };
       },
     });

@@ -1,6 +1,6 @@
-import type { GuildMember, Message, User } from "seyfert";
-import { convertToHEX } from "./utils";
-import { UserFlags } from "seyfert/lib/types";
+import type { GuildMember, Message, User } from 'seyfert';
+import { convertToHEX } from './utils';
+import { UserFlags } from 'seyfert/lib/types';
 
 export type Profile = {
   author: string; // author of the message
@@ -37,11 +37,7 @@ export async function buildProfiles(messages: Message[]) {
     if (message.thread && message.thread.lastMessageId) {
       const thread = await message.client.messages.fetch(message.thread.lastMessageId, message.channelId);
 
-      profiles[thread.author.id] = await buildProfile(
-        thread.member,
-        thread.guildId,
-        thread.author
-      );
+      profiles[thread.author.id] = await buildProfile(thread.member, message.guildId, thread.author);
     }
   }
 
@@ -52,14 +48,21 @@ export async function buildProfiles(messages: Message[]) {
 async function buildProfile(member: GuildMember | null | undefined, guildId: string | null | undefined, author: User) {
   await author.fetch();
 
-  if (guildId && !member) member = await author.client.members.fetch(guildId, author.id)
+  if (guildId && !member) member = await author.client.members.fetch(guildId, author.id);
+
+  await member?.fetch();
 
   const role = await member?.roles.highest();
 
+  await role?.fetch();
+
+  const authorName = author.bot ? author.username : author.tag;
+  const roleColor = role?.color ?? author.accentColor;
+
   return {
-    author: author.tag,
+    author: member?.nick ?? authorName,
     avatar: member?.avatarURL({ size: 64 }) ?? author.avatarURL({ size: 64 }),
-    roleColor: convertToHEX(role?.color ?? author.accentColor ?? undefined),
+    roleColor: roleColor ? convertToHEX(roleColor) : undefined,
     roleIcon: role?.icon ?? undefined,
     roleName: role?.name ?? undefined,
     bot: author.bot,

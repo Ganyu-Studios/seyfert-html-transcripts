@@ -10,6 +10,7 @@ import type { RenderMessageContext } from '..';
 import { calculateInlineIndex } from '../../utils/embeds';
 import MessageContent, { RenderType } from './content';
 import type { Embed, Message } from 'seyfert';
+import { convertToHEX } from '../../utils/utils';
 
 type RenderEmbedContext = RenderMessageContext & {
   index: number;
@@ -25,7 +26,7 @@ export async function DiscordEmbed({ embed, context }: { embed: Embed; context: 
       authorImage={embed.data.author?.proxy_icon_url ?? embed.data.author?.icon_url}
       authorName={embed.data.author?.name}
       authorUrl={embed.data.author?.url}
-      color={embed.data.color?.toString() ?? undefined}
+      color={embed.data.color ? convertToHEX(embed.data.color) : undefined}
       image={embed.data.image?.proxy_url ?? embed.data.image?.url}
       thumbnail={embed.data.thumbnail?.proxy_url ?? embed.data.thumbnail?.url}
       url={embed.data.url ?? undefined}

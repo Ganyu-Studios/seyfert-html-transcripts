@@ -7,7 +7,7 @@ import {
   DiscordThread,
   DiscordThreadMessage,
 } from '@derockdev/discord-components-react';
-import type { ActionRow, AllGuildTextableChannels, Message as MessageType } from 'seyfert';
+import type { ActionRow, Message as MessageType } from 'seyfert';
 import React from 'react';
 import type { RenderMessageContext } from '..';
 import { parseDiscordEmoji } from '../../utils/utils';
@@ -17,7 +17,7 @@ import MessageContent, { RenderType } from './content';
 import { DiscordEmbed } from './embed';
 import MessageReply from './reply';
 import DiscordSystemMessage from './systemMessage';
-import type { APIMessageComponentEmoji} from 'seyfert/lib/types';
+import type { APIMessageComponentEmoji } from 'seyfert/lib/types';
 import { ChannelType } from 'seyfert/lib/types';
 
 export default async function DiscordMessage({
@@ -27,13 +27,12 @@ export default async function DiscordMessage({
   message: MessageType;
   context: RenderMessageContext;
 }) {
-  if ((message as never as { system: boolean }).system) return <DiscordSystemMessage message={message} />;
+  if ('system' in message) return <DiscordSystemMessage message={message} />;
 
-  const guildId = message.guildId ?? ((await message.channel()) as AllGuildTextableChannels).guildId;
-  const isCrosspost = message.messageReference && message.messageReference.guildId !== guildId;
+  const isCrosspost = message.messageReference && message.messageReference.guildId !== message.guildId;
   const threadMessage =
     message.thread &&
-      (message.thread.type === ChannelType.PublicThread || message.thread.type === ChannelType.PrivateThread)
+    (message.thread.type === ChannelType.PublicThread || message.thread.type === ChannelType.PrivateThread)
       ? await message.client.messages.fetch(message.thread.lastMessageId!, message.thread.id).catch(() => null)
       : null;
 
@@ -44,7 +43,7 @@ export default async function DiscordMessage({
       key={message.id}
       edited={message.editedTimestamp !== null}
       server={isCrosspost ?? undefined}
-      highlight={message.mentions.roles.includes("@everyone") || message.mentions.roles.includes("@here")}
+      highlight={message.mentions.roles.includes('@everyone') || message.mentions.roles.includes('@here')}
       profile={message.author.id}
     >
       {/* reply */}

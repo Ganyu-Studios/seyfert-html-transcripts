@@ -18,17 +18,23 @@ export default async function DiscordMessages({ messages, channel, callbacks, ..
     <DiscordMessagesComponent style={{ minHeight: '100vh' }}>
       {/* header */}
       <DiscordHeader
-        guild={channel.isDM() || channel.isDirectory() ? 'Direct Messages' : (channel as AllGuildTextableChannels).guild.name}
+        guild={
+          channel.isDM() || channel.isDirectory() ? 'Direct Messages' : (channel as AllGuildTextableChannels).guild.name
+        }
         channel={
           channel.isDM()
             ? channel.type === ChannelType.DM
-              ? channel.recipients?.find((r) => r.id !== channel.id)?.username ?? 'Unknown Recipient'
+              ? (channel.recipients?.find((r) => r.id !== channel.id)?.username ?? 'Unknown Recipient')
               : 'Unknown Recipient'
             : channel.isDirectory()
-              ? "Unknown Directory"
+              ? 'Unknown Directory'
               : (channel as AllGuildTextableChannels).name
         }
-        icon={channel.isDM() || channel.isDirectory() ? undefined : (await (channel as AllGuildTextableChannels).guild()).iconURL({ size: 128 }) ?? undefined}
+        icon={
+          channel.isDM() || channel.isDirectory()
+            ? undefined
+            : ((await (channel as AllGuildTextableChannels).guild()).iconURL({ size: 128 }) ?? undefined)
+        }
       >
         {channel.isThread() ? (
           `Thread channel in ${channel.parentId ?? 'Unknown Channel'}`
@@ -43,8 +49,10 @@ export default async function DiscordMessages({ messages, channel, callbacks, ..
             content={channel.topic}
             context={{ messages, channel, callbacks, type: RenderType.REPLY, ...options }}
           />
+        ) : channel.isDirectory() ? (
+          `This is the start of the directory.`
         ) : (
-          channel.isDirectory() ? `This is the start of the directory.` : `This is the start of #${(channel as AllGuildTextableChannels).name} channel.`
+          `This is the start of #${(channel as AllGuildTextableChannels).name} channel.`
         )}
       </DiscordHeader>
 
@@ -57,8 +65,8 @@ export default async function DiscordMessages({ messages, channel, callbacks, ..
       <div style={{ textAlign: 'center', width: '100%' }}>
         {options.footerText
           ? options.footerText
-            .replaceAll('{number}', messages.length.toString())
-            .replaceAll('{s}', messages.length > 1 ? 's' : '')
+              .replaceAll('{number}', messages.length.toString())
+              .replaceAll('{s}', messages.length > 1 ? 's' : '')
           : `Exported ${messages.length} message${messages.length > 1 ? 's' : ''}.`}{' '}
         {options.poweredBy ? (
           <span style={{ textAlign: 'center' }}>

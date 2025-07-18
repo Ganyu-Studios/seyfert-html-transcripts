@@ -52,29 +52,11 @@ export async function Attachment({
 
   const type = getAttachmentType(attachment);
 
-  function toJSON(message: Message) {
-    const keys = Object.getOwnPropertyNames(message);
-    const obj: Partial<APIMessage> = {};
-
-    for (const key of keys) {
-      if (['timestamp', 'client'].includes(key)) continue;
-
-      const value = message[key as keyof Message];
-      if (value && typeof value === "object" && "client" in value) Object.defineProperty(value, "client", { value: undefined });
-
-      if (value === undefined || value === null) continue;
-
-      obj[ReplaceRegex.snake(key) as keyof APIMessage] = toSnakeCase(message[key as keyof Message] as never);
-    }
-
-    return obj;
-  }
-
   // if the attachment is an image, download it to a data url
   if (type === 'image') {
     const downloaded = await context.callbacks.resolveImageSrc(
-      "data" in attachment ? attachment.data : attachment,
-      toJSON(message) as APIMessage,
+      'data' in attachment ? attachment.data : attachment,
+      toJSON(message) as APIMessage
     );
 
     if (downloaded !== null) {
@@ -94,4 +76,23 @@ export async function Attachment({
       height={height ?? undefined}
     />
   );
+}
+
+function toJSON(message: Message) {
+  const keys = Object.getOwnPropertyNames(message);
+  const obj: Partial<APIMessage> = {};
+
+  for (const key of keys) {
+    if (['timestamp', 'client'].includes(key)) continue;
+
+    const value = message[key as keyof Message];
+    if (value && typeof value === 'object' && 'client' in value)
+      Object.defineProperty(value, 'client', { value: undefined });
+
+    if (value === undefined || value === null) continue;
+
+    obj[ReplaceRegex.snake(key) as keyof APIMessage] = toSnakeCase(message[key as keyof Message] as never);
+  }
+
+  return obj;
 }

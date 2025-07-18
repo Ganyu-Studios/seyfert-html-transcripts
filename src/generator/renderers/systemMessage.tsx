@@ -6,7 +6,7 @@ import type { APIMessageComponentEmoji } from 'seyfert/lib/types';
 import { MessageType } from 'seyfert/lib/types';
 
 export default async function SystemMessage({ message }: { message: Message }) {
-  const role = await message.member?.roles.highest()
+  const role = await message.member?.roles.highest();
 
   switch (message.type) {
     case MessageType.RecipientAdd:
@@ -20,10 +20,8 @@ export default async function SystemMessage({ message }: { message: Message }) {
     case MessageType.ChannelPinnedMessage:
       return (
         <DiscordSystemMessage id={`m-${message.id}`} key={message.id} type="pin">
-          <Highlight color={convertToHEX(role?.color)}>
-            {message.author.tag}
-          </Highlight>{' '}
-          pinned <i data-goto={message.messageReference?.messageId}>a message</i> to this channel.
+          <Highlight color={convertToHEX(role?.color)}>{message.author.tag}</Highlight> pinned{' '}
+          <i data-goto={message.messageReference?.messageId}>a message</i> to this channel.
           {/* reactions */}
           {message.reactions && message.reactions.length > 0 && (
             <DiscordReactions slot="reactions">
@@ -46,20 +44,15 @@ export default async function SystemMessage({ message }: { message: Message }) {
     case MessageType.GuildBoostTier3:
       return (
         <DiscordSystemMessage id={`m-${message.id}`} key={message.id} type="boost">
-          <Highlight color={convertToHEX(role?.color)}>
-            {message.author.tag}
-          </Highlight>{' '}
-          boosted the server!
+          <Highlight color={convertToHEX(role?.color)}>{message.author.tag}</Highlight> boosted the server!
         </DiscordSystemMessage>
       );
 
     case MessageType.ThreadStarterMessage:
       return (
         <DiscordSystemMessage id={`ms-${message.id}`} key={message.id} type="thread">
-          <Highlight color={convertToHEX(role?.color)}>
-            {message.author.tag}
-          </Highlight>{' '}
-          started a thread: <i data-goto={message.messageReference?.messageId}>{message.content}</i>
+          <Highlight color={convertToHEX(role?.color)}>{message.author.tag}</Highlight> started a thread:{' '}
+          <i data-goto={message.messageReference?.messageId}>{message.content}</i>
         </DiscordSystemMessage>
       );
 
@@ -112,9 +105,15 @@ const allJoinMessages = [
   "Hello. Is it {user} you're looking for?",
 ];
 
-export async function JoinMessage({ member, fallbackUser }: { member: GuildMember | null | undefined; fallbackUser: User }) {
+export async function JoinMessage({
+  member,
+  fallbackUser,
+}: {
+  member: GuildMember | null | undefined;
+  fallbackUser: User;
+}) {
   const randomMessage = allJoinMessages[Math.floor(Math.random() * allJoinMessages.length)];
-  const role = await member?.roles.highest()
+  const role = await member?.roles.highest();
 
   return randomMessage
     .split('{user}')
