@@ -4,7 +4,7 @@ import type { Attachment as AttachmentType, Message } from 'seyfert';
 import type { RenderMessageContext } from '..';
 import type { AttachmentTypes } from '../../types';
 import { formatBytes } from '../../utils/utils';
-import type { APIMessage } from 'seyfert/lib/types';
+import type { APIAttachment, APIMessage } from 'seyfert/lib/types';
 import { ReplaceRegex, toSnakeCase } from 'seyfert/lib/common';
 
 /**
@@ -51,13 +51,12 @@ export async function Attachment({
   const height = attachment.height;
 
   const type = getAttachmentType(attachment);
+  const attach = ('data' in attachment ? attachment.data : attachment) as APIAttachment;
+  const json = toJSON(message) as APIMessage;
 
   // if the attachment is an image, download it to a data url
   if (type === 'image') {
-    const downloaded = await context.callbacks.resolveImageSrc(
-      'data' in attachment ? attachment.data : attachment,
-      toJSON(message) as APIMessage
-    );
+    const downloaded = await context.callbacks.resolveImageSrc(attach, json);
 
     if (downloaded !== null) {
       url = downloaded ?? url;
@@ -78,6 +77,11 @@ export async function Attachment({
   );
 }
 
+/**
+ * Converts a Message to a JSON object
+ * @param {Message} message the message to convert
+ * @returns the JSON object
+ */
 function toJSON(message: Message) {
   const keys = Object.getOwnPropertyNames(message);
   const obj: Partial<APIMessage> = {};

@@ -6,7 +6,7 @@ import {
   type ObjectType,
 } from './types';
 import { TranscriptImageDownloader, type ResolveImageCallback } from './downloader/images';
-import type { AllGuildChannels, Message, TextBaseGuildChannel } from 'seyfert';
+import type { AllChannels, AllGuildChannels, Message } from 'seyfert';
 import { AttachmentBuilder, Collection } from 'seyfert';
 
 // re-exports
@@ -30,7 +30,7 @@ export async function generateFromMessages<T extends ExportReturnType = ExportRe
     if (channel.isDM() || channel.isDirectory()) return message;
     if (typeof message.guildId === 'undefined') message.guildId = channel.guildId;
     return message;
-  })
+  });
 
   // figure out how the user wants images saved
   let resolveImageSrc: ResolveImageCallback = options.callbacks?.resolveImageSrc ?? ((attachment) => attachment.url);
@@ -96,7 +96,7 @@ export async function generateFromMessages<T extends ExportReturnType = ExportRe
  * @returns       The generated transcript
  */
 export async function createTranscript<T extends ExportReturnType = ExportReturnType.Attachment>(
-  channel: TextBaseGuildChannel,
+  channel: AllChannels,
   options: CreateTranscriptOptions<T> = {}
 ): Promise<ObjectType<T>> {
   // validate type
