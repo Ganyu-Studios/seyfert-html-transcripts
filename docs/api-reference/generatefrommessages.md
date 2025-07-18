@@ -1,6 +1,6 @@
 # generateFromMessages
 
-If you want to provide your own messages for finer control of what `discord-html-transcripts` will save, use this function.
+If you want to provide your own messages for finer control of what `seyfert-html-transcripts` will save, use this function.
 
 ## Example
 
@@ -8,7 +8,7 @@ If you want to provide your own messages for finer control of what `discord-html
 {% tab title="JavaScript" %}
 
 ```javascript
-const discordTranscripts = require("discord-html-transcripts");
+const discordTranscripts = require("seyfert-html-transcripts");
 const { Collection } = require("discord.js");
 
 [...]
@@ -35,7 +35,7 @@ channel.send({
 {% tab title="TypeScript" %}
 
 ```typescript
-import * as discordTranscripts from "discord-html-transcripts";
+import * as discordTranscripts from "seyfert-html-transcripts";
 import { Collection, Message } from "discord.js";
 
 [...]
@@ -77,7 +77,7 @@ Defined in [discord.js](https://discord.js.org/#/docs/discord.js/main/typedef/Gu
 
 ### `options: GenerateFromMessagesOptions`
 
-An object with the discord-html-transcripts configuration options.
+An object with the seyfert-html-transcripts configuration options.
 
 <details>
 

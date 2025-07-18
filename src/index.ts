@@ -26,13 +26,18 @@ export async function generateFromMessages<T extends ExportReturnType = ExportRe
 ): Promise<ObjectType<T>> {
   // turn messages into an array
   const transformedMessages = messages instanceof Collection ? Array.from(messages.values()) : messages;
+  const allMessages = transformedMessages.map((message) => {
+    if (channel.isDM() || channel.isDirectory()) return message;
+    if (typeof message.guildId === 'undefined') message.guildId = channel.guildId;
+    return message;
+  })
 
   // figure out how the user wants images saved
   let resolveImageSrc: ResolveImageCallback = options.callbacks?.resolveImageSrc ?? ((attachment) => attachment.url);
   if (options.saveImages) {
     if (options.callbacks?.resolveImageSrc) {
       console.warn(
-        `[discord-html-transcripts] You have specified both saveImages and resolveImageSrc, please only specify one. resolveImageSrc will be used.`
+        `[seyfert-html-transcripts] You have specified both saveImages and resolveImageSrc, please only specify one. resolveImageSrc will be used.`
       );
     } else {
       resolveImageSrc = new TranscriptImageDownloader().build();
@@ -42,7 +47,7 @@ export async function generateFromMessages<T extends ExportReturnType = ExportRe
 
   // render the messages
   const html = await DiscordMessages({
-    messages: transformedMessages,
+    messages: allMessages,
     channel,
     saveImages: options.saveImages ?? false,
     callbacks: {
@@ -65,7 +70,7 @@ export async function generateFromMessages<T extends ExportReturnType = ExportRe
   // get the time it took to render the messages
   // const renderTime = process.hrtime(startTime);
   // console.log(
-  //   `[discord-html-transcripts] Rendered ${transformedMessages.length} messages in ${renderTime[0]}s ${
+  //   `[seyfert-html-transcripts] Rendered ${transformedMessages.length} messages in ${renderTime[0]}s ${
   //     renderTime[1] / 1000000
   //   }ms`
   // );
@@ -115,12 +120,7 @@ export async function createTranscript<T extends ExportReturnType = ExportReturn
     const filteredMessages = typeof filter === 'function' ? messages.filter(filter) : messages;
 
     // add the messages to the array
-    allMessages.push(
-      ...filteredMessages.map((message) => {
-        if (typeof message.guildId === 'undefined') message.guildId = channel.guildId;
-        return message;
-      })
-    );
+    allMessages.push(...filteredMessages);
     // Get the last key of 'messages', not 'filteredMessages' because you will be refetching the same messages
     lastMessageId = messages.at(-1)?.id;
 

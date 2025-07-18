@@ -9,7 +9,7 @@ Will fetch (by default, all) the messages from the provided channel and can retu
 {% code lineNumbers="true" %}
 
 ```javascript
-const discordTranscripts = require("discord-html-transcripts");
+const discordTranscripts = require("seyfert-html-transcripts");
 
 [...]
 
@@ -44,7 +44,7 @@ client.on('messageCreate', async (message) => {
 {% code lineNumbers="true" %}
 
 ```typescript
-import * as discordTranscripts from "discord-html-transcripts";
+import * as discordTranscripts from "seyfert-html-transcripts";
 
 [...]
 
