@@ -38,7 +38,7 @@ client.events.values.READY = {
       console.info(`Generating transcript for channel ${channel.name}...`);
 
       const attachment = await createTranscript(channel, {
-        // the options for the
+        // the options for the transcript
         limit: 10,
       });
 
