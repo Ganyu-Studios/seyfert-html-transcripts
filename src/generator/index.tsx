@@ -1,15 +1,15 @@
-import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import { buildProfiles } from '../utils/buildProfiles';
-import { revealSpoiler, scrollToMessage } from '../static/client';
+import { renderToString } from '@derockdev/discord-components-core/hydrate';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { renderToString } from '@derockdev/discord-components-core/hydrate';
-import { streamToString } from '../utils/utils';
-import DiscordMessages from './transcript';
-import type { ResolveImageCallback } from '../downloader/images';
+import React from 'react';
+import { prerenderToNodeStream } from 'react-dom/static';
 import type { AllChannels, AllGuildTextableChannels, GuildRole, Message, User } from 'seyfert';
 import type { Awaitable } from 'seyfert/lib/common';
+import type { ResolveImageCallback } from '../downloader/images';
+import { revealSpoiler, scrollToMessage } from '../static/client';
+import { buildProfiles } from '../utils/buildProfiles';
+import { streamToString } from '../utils/utils';
+import DiscordMessages from './transcript';
 
 // read the package.json file and get the @derockdev/discord-components-core version
 let discordComponentsVersion = '^3.6.1';
@@ -44,7 +44,8 @@ export default async function render({ messages, channel, callbacks, ...options 
 
   // NOTE: this renders a STATIC site with no interactivity
   // if interactivity is needed, switch to renderToPipeableStream and use hydrateRoot on client.
-  const stream = ReactDOMServer.renderToStaticNodeStream(
+  // tysom sagiriikeda to fix this <3
+  const stream = await prerenderToNodeStream(
     <html>
       <head>
         <meta charSet="utf-8" />
@@ -81,7 +82,7 @@ export default async function render({ messages, channel, callbacks, ...options 
             {/* profiles */}
             <script
               dangerouslySetInnerHTML={{
-                __html: `window.$discordMessage={profiles:${JSON.stringify(await profiles)}}`,
+                __html: `window.$discordMessage={profiles:${JSON.stringify(profiles)}}`,
               }}
             ></script>
             {/* component library */}
@@ -107,7 +108,7 @@ export default async function render({ messages, channel, callbacks, ...options 
     </html>
   );
 
-  const markup = await streamToString(stream);
+  const markup = await streamToString(stream.prelude);
 
   if (options.hydrate) {
     const result = await renderToString(markup, {
