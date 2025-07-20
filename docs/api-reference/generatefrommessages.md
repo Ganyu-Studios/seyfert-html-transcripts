@@ -9,7 +9,7 @@ If you want to provide your own messages for finer control of what `seyfert-html
 
 ```javascript
 const discordTranscripts = require("seyfert-html-transcripts");
-const { Collection } = require("discord.js");
+const { Collection } = require("seyfert");
 
 [...]
 
@@ -25,7 +25,7 @@ const transcript = await discordTranscripts.generateFromMessages(
 );
 
 // By default returns an AttachmentBuilder that can be sent in a channel.
-channel.send({
+channel.messages.write({
     files: [attachment]
 });
 ```
@@ -36,7 +36,7 @@ channel.send({
 
 ```typescript
 import * as discordTranscripts from "seyfert-html-transcripts";
-import { Collection, Message } from "discord.js";
+import { Collection, Message } from "seyfert";
 
 [...]
 
@@ -52,7 +52,7 @@ const transcript = await discordTranscripts.generateFromMessages(
 );
 
 // By default returns an AttachmentBuilder that can be sent in a channel.
-channel.send({
+channel.messages.write({
     files: [attachment]
 });
 ```
@@ -68,11 +68,11 @@ generateFromMessages(messages, channel, (options = {}));
 
 ### `messages: Message[] | Collection<string, Message>`
 
-These are the messages that will be used in the body of the transcript. Can either be an array of discord.js [Message](https://discord.js.org/#/docs/discord.js/main/class/Message) objects or a [Collection](https://discord.js.org/#/docs/collection/main/class/Collection) of Messages.
+These are the messages that will be used in the body of the transcript. Can either be an array of seyfert Message objects or a Collection of Messages.
 
-### `channel: TextBasedChannel`
+### `channel: AllChannels`
 
-Defined in [discord.js](https://discord.js.org/#/docs/discord.js/main/typedef/GuildTextBasedChannel) as `TextChannel | NewsChannel | ThreadChannel | VoiceChannel`\
+Defined in seyfert as `TextGuildChannelStructure | VoiceChannelStructure | MediaChannelStructure | ForumChannelStructure | ThreadChannelStructure | CategoryChannelStructure | NewsChannelStructure | DirectoryChannelStructure | StageChannelStructure`\
 ``This is channel is used to grab information about the transcript, like guild name and icon, channel name, etc.
 
 ### `options: GenerateFromMessagesOptions`
@@ -91,9 +91,9 @@ const attachment = await discordTranscripts.createTranscript(channel, {
     footerText: "Exported {number} message{s}", // Change text at footer, don't forget to put {number} to show how much messages got exported, and {s} for plural
     callbacks: {
       // register custom callbacks for the following:
-      resolveChannel: (channelId: string) => Awaitable<Channel | null>,
+      resolveChannel: (channelId: string) => Awaitable<AllChannels | null>,
       resolveUser: (userId: string) => Awaitable<User | null>,
-      resolveRole: (roleId: string) => Awaitable<Role | null>
+      resolveRole: (roleId: string) => Awaitable<GuildRole | null>
     },
     poweredBy: true // Whether to include the "Powered by seyfert-html-transcripts" footer
 });
@@ -141,7 +141,7 @@ Disabling this will remove the `Powered by seyfert-html-transcripts` in the foot
 
 The default value is `true`
 
-#### `options.callbacks.resolveChannel: (channelId: string) => Awaitable<Channel | null>`
+#### `options.callbacks.resolveChannel: (channelId: string) => Awaitable<AllChannels | null>`
 
 A custom function that will be used by the module whenever it needs to resolve a channel (for example, if someone mentions a channel)
 
@@ -153,8 +153,8 @@ A custom function that will be used by the module whenever it needs to resolve a
 
 The default option uses `channel.client.users.fetch(...)`
 
-#### `options.callbacks.resolveRole: (roleId: string) => Awaitable<Role | null>`
+#### `options.callbacks.resolveRole: (roleId: string) => Awaitable<GuildRole | null>`
 
 #### A custom function that will be used by the module whenever it needs to resolve a role (for example, if a role is mentioned)
 
-The default option uses `channel.guild?.roles.fetch(...)`
+The default option uses `channel.client.roles.fetch(...)`

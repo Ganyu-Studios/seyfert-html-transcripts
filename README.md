@@ -1,6 +1,6 @@
 # `seyfert-html-transcripts`
 
-[![Discord](https://img.shields.io/discord/555474311637499955?label=discord)](https://discord.gg/rf5qN7C)
+[![Discord](https://img.shields.io/discord/555474311637499955?label=discord)](https://discord.gg/4JmKY8wgB6)
 [![npm](https://img.shields.io/npm/dw/seyfert-html-transcripts)](http://npmjs.org/package/seyfert-html-transcripts)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/Ganyu-Studios/seyfert-html-transcripts)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Ganyu-Studios/seyfert-html-transcripts?style=social)
@@ -49,12 +49,12 @@ Instead, please open a thread on [this](https://discord.gg/MZQN8QMJg8) server.
 const discordTranscripts = require('seyfert-html-transcripts');
 // or (if using typescript) import * as discordTranscripts from 'seyfert-html-transcripts';
 
-const channel = message.channel; // or however you get your TextChannel
+const channel = await message.channel(); // or however you get your TextChannel
 
 // Must be awaited
 const attachment = await discordTranscripts.createTranscript(channel);
 
-channel.send({
+channel.messages.write({
   files: [attachment],
 });
 ```
@@ -71,7 +71,7 @@ const channel = someWayToGetChannel(); // Used for ticket name, guild icon, and 
 // Must be awaited
 const attachment = await discordTranscripts.generateFromMessages(messages, channel);
 
-channel.send({
+channel.messages.write({
   files: [attachment],
 });
 ```
@@ -92,9 +92,9 @@ const attachment = await discordTranscripts.createTranscript(channel, {
     footerText: "Exported {number} message{s}", // Change text at footer, don't forget to put {number} to show how much messages got exported, and {s} for plural
     callbacks: {
       // register custom callbacks for the following:
-      resolveChannel: (channelId: string) => Awaitable<Channel | null>,
+      resolveChannel: (channelId: string) => Awaitable<AllChannels | null>,
       resolveUser: (userId: string) => Awaitable<User | null>,
-      resolveRole: (roleId: string) => Awaitable<Role | null>
+      resolveRole: (roleId: string) => Awaitable<GuildRole | null>
     },
     poweredBy: true, // Whether to include the "Powered by seyfert-html-transcripts" footer
     hydrate: true, // Whether to hydrate the html server-side
@@ -112,4 +112,4 @@ const attachment = await discordTranscripts.generateFromMessages(messages, chann
 
 ## 🤝 Enjoy the package?
 
-Give it a star ⭐ and/or support me on [ko-fi](https://ko-fi.com/derock)
+Give it a star ⭐ and/or support me on [ko-fi](https://ko-fi.com/justevil)

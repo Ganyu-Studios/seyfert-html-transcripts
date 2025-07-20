@@ -13,12 +13,16 @@ const discordTranscripts = require("seyfert-html-transcripts");
 
 [...]
 
-// Notice the async here    ⤵️
-client.on('messageCreate', async (message) => {
-    if (message.content === "!transcript") {
+export default createEvent({
+    data: { name: "messageCreate" },
+//   ⤵️ Notice the async here
+    async run(message) {
+        if (message.content === "!transcript") {
+        const channel = await message.channel();
+
         // Use the following to fetch the transcript.
         const transcript = await discordTranscripts.createTranscript(
-            message.channel,
+            channel,
             {
                 // options go here
                 // for example
@@ -28,11 +32,12 @@ client.on('messageCreate', async (message) => {
         );
 
         // and by default, createTranscript will return an AttachmentBuilder
-        // which you can directly send to discord.js
+        // which you can directly send to seyfert
         message.reply({
             content: "Here's your transcript!",
             files: [transcript]
         });
+    }
     }
 });
 ```
@@ -48,12 +53,16 @@ import * as discordTranscripts from "seyfert-html-transcripts";
 
 [...]
 
-// Notice the async here    ⤵️
-client.on('messageCreate', async (message) => {
-    if (message.content === "!transcript") {
+export default createEvent({
+    data: { name: "messageCreate" },
+//   ⤵️ Notice the async here
+    async run(message) {
+        if (message.content === "!transcript") {
+        const channel = await message.channel();
+
         // Use the following to fetch the transcript.
         const transcript = await discordTranscripts.createTranscript(
-            message.channel,
+            channel,
             {
                 // options go here
                 // for example
@@ -63,11 +72,12 @@ client.on('messageCreate', async (message) => {
         );
 
         // and by default, createTranscript will return an AttachmentBuilder
-        // which you can directly send to discord.js
+        // which you can directly send to seyfert
         message.reply({
             content: "Here's your transcript!",
             files: [transcript]
         });
+    }
     }
 });
 ```
@@ -82,9 +92,9 @@ client.on('messageCreate', async (message) => {
 createTranscript(channel, (options = {}));
 ```
 
-### `channel: TextBasedChannel`
+### `channel: AllGuildChannels`
 
-Defined in [discord.js](https://discord.js.org/#/docs/discord.js/main/typedef/GuildTextBasedChannel) as `TextChannel | NewsChannel | ThreadChannel | VoiceChannel`\
+Defined in seyfert as `TextGuildChannelStructure | VoiceChannelStructure | MediaChannelStructure | ForumChannelStructure | ThreadChannelStructure | CategoryChannelStructure | NewsChannelStructure | DirectoryChannelStructure | StageChannelStructure`\
 ``This is the channel Discord HTML Transcripts will fetch messages from.&#x20;
 
 ### `options: CreateTranscriptOptions`
@@ -95,6 +105,6 @@ The same options as [generatefrommessages.md](generatefrommessages.md 'mention')
 
 The number of messages to fetch.
 
-### `options.filter: (message: Message<boolean>) => boolean`
+### `options.filter: (message: Message) => boolean`
 
 A function that will be called for each message to determine if it should be included in the transcript. If false, the message will not be included.

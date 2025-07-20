@@ -8,7 +8,7 @@ Discord HTML Transcripts is a node.js module to generate nice-looking HTML trans
 
 ## Socials
 
-Join the [Discord Server](https://discord.gg/VgMxx2NAu4) and create a new forum post if you need help. You can also follow the announcement channel to get updates whenever a new version is released.
+Join the [Discord Server](https://discord.gg/4JmKY8wgB6) and create a new forum post if you need help. You can also follow the announcement channel to get updates whenever a new version is released.
 
 If you find a bug, please create a post on [GitHub](https://github.com/Ganyu-Studios/seyfert-html-transcripts/issues).
 
@@ -28,7 +28,7 @@ npm install --save seyfert-html-transcripts
 {% tab title="PNPM" %}
 
 ```shell
-pnpm i -S seyfert-html-transcripts`
+pnpm i -S seyfert-html-transcripts
 ```
 
 {% endtab %}
@@ -47,7 +47,7 @@ yarn add seyfert-html-transcripts
 The code to this module can be found on GitHub:
 
 {% embed url="https://github.com/Ganyu-Studios/seyfert-html-transcripts" %}
-ItzDerock/seyfert-html-transcripts
+Ganyu-Studios/seyfert-html-transcripts
 {% endembed %}
 
 The markdown files to this documentation can also be found there.
