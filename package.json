@@ -1,6 +1,6 @@
 {
   "name": "seyfert-html-transcripts",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "A nicely formatted html transcript generator for seyfert.",
   "main": "dist/index.js",
   "homepage": "https://github.com/Ganyu-Studios/seyfert-html-transcripts",
