@@ -31,13 +31,16 @@ export default async function MessageReply({ message, context }: { message: Mess
   const roleColor = role?.color ?? referencedMessage.author.accentColor;
   const authorName = referencedMessage.author.bot ? referencedMessage.author.username : referencedMessage.author.tag;
 
+  // what the f*uck is wrong with you?
+  if (typeof referencedMessage.author.client === "undefined") (referencedMessage.author as { client: undefined | typeof message.client }).client = message.client;
+
   return (
     <DiscordReply
       slot="reply"
       edited={!isCommand && referencedMessage.editedTimestamp !== null}
       attachment={referencedMessage.attachments.length > 0}
       author={referencedMessage.member?.nick ?? authorName}
-      avatar={referencedMessage.author.avatarURL({ size: 32 }) ?? undefined}
+      avatar={referencedMessage.author.avatarURL({ size: 32 })}
       roleColor={roleColor ? convertToHEX(roleColor) : undefined}
       bot={!isCrosspost && referencedMessage.author.bot}
       verified={(referencedMessage.author.publicFlags ?? 0 & UserFlags.VerifiedBot) === UserFlags.VerifiedBot}

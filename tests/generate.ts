@@ -8,10 +8,11 @@ import { createTranscript } from '../src';
 const client = new Client({
   getRC() {
     return {
+      debug: true,
+      token: process.env.TOKEN!,
       locations: {
         base: '.',
       },
-      token: process.env.TOKEN!,
       intents: [
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.Guilds,
